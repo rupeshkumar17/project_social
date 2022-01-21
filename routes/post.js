@@ -1,12 +1,15 @@
-const {getPosts,createPost} = require("../controllers/post")
-const express = require("express")
+const { getPosts, createPost } = require("../controllers/post");
+const express = require("express");
+const { requireSignin } = require("../controllers/auth");
 const { createPostValidator } = require("../validators/index");
+const { userById } = require("../controllers/user");
 
-const router = express.Router()
-
+const router = express.Router();
 
 router.get("/", getPosts);
-router.post("/post",createPostValidator, createPost);
+router.post("/post", requireSignin, createPostValidator, createPost);
 
-module.exports =router
- 
+//any route containing user id aur app will excute user id
+router.param("userId", userById);
+
+module.exports = router;
