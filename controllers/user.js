@@ -1,10 +1,12 @@
-const User = require("../models/user");
-const _ = require("lodash");
+const _ = require('lodash');
+const User = require('../models/user');
+
+
 
 exports.userById = (req, res, next, id) => {
   User.findById(id).exec((err, user) => {
     if (err || !user) {
-      return res.status(400).json({ error: "User Not Found" });
+      return res.status(400).json({ error: 'User Not Found' });
     }
     req.profile = user; //adds  profile object in req with user info
     next();
@@ -17,17 +19,19 @@ exports.hasAuthorization = function (req, res, next) {
   if (!authorized) {
     return res
       .status(403)
-      .json({ error: "user is not authorize to perform this action" });
+      .json({ error: 'user is not authorize to perform this action' });
   }
 };
 
 exports.allUsers = (req, res) => {
   User.find((err, users) => {
     if (err) {
-      return res.status(400).json({ error: err });
+      return res.status(400).json({
+        error: err,
+      });
     }
-    res.json({ users });
-  }).select("name email updated created");
+    res.json(users);
+  }).select('name email updated created role');
 };
 
 exports.getUser = (req, res) => {
@@ -45,13 +49,14 @@ exports.updateUser = (req, res, next) => {
     if (err) {
       return res
         .status(400)
-        .json({ error: "you are not authorized to perform thisa action" });
+        .json({ error: "you are not authorized to perform this action" });
     }
     user.hashed_password = undefined;
     user.salt = undefined;
     res.json({ user });
   });
 };
+
 
 exports.deleteUser = (req, res, next) => {
   let user = req.profile;
@@ -61,6 +66,6 @@ exports.deleteUser = (req, res, next) => {
     }
     // user.hashed_password = undefined;
     // user.salt = undefined;
-    res.json({ message:"User deleted succesfully " });
+    res.json({ message: 'User deleted succesfully ' });
   });
 };

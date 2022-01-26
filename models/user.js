@@ -1,26 +1,26 @@
-const mongoose = require("mongoose");
-const { v4: uuidv4 } = require("uuid");
-const crypto = require("crypto");
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   name: {
-    type: "String",
+    type: 'String',
     trim: true,
     required: true,
   },
   email: {
-    type: "String",
+    type: 'String',
     trim: true,
     required: true,
   },
   hashed_password: {
-    type: "String",
+    type: 'String',
 
     required: true,
   },
   salt: String,
   created: {
-    type: "Date",
+    type: 'Date',
     default: Date.now,
   },
   updated: Date,
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
 
 //virtual field
 userSchema
-  .virtual("password")
+  .virtual('password')
   .set(function (password) {
     //create temparory variable for
 
@@ -49,16 +49,16 @@ userSchema.methods = {
   },
 
   encryptPassword: function (password) {
-    if (!password) return "";
+    if (!password) return '';
     try {
       return crypto
-        .createHmac("sha256", this.salt)
+        .createHmac('sha256', this.salt)
         .update(password)
-        .digest("hex");
+        .digest('hex');
     } catch (err) {
-      return "";
+      return '';
     }
   },
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema);

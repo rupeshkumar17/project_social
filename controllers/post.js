@@ -1,11 +1,11 @@
-const Post = require("../models/post");
-const formidable = require("formidable");
-const fs = require("fs");
-const _ = require("lodash");
+const Post = require('../models/post');
+const formidable = require('formidable');
+const fs = require('fs');
+const _ = require('lodash');
 
 exports.postById = (req, res, next, id) => {
   Post.findById(id)
-    .populate("postedBy", "_id name")
+    .populate('postedBy', '_id name')
     .exec((err, post) => {
       if (err || !post) {
         return res.status(400).json({ error: err });
@@ -17,8 +17,8 @@ exports.postById = (req, res, next, id) => {
 
 exports.getPosts = (req, res) => {
   const posts = Post.find()
-    .populate("postedBy", "_id name")
-    .select("_id title body ")
+    .populate('postedBy', '_id name')
+    .select('_id title body ')
     .then((posts) => {
       res.json({ posts });
     })
@@ -33,7 +33,7 @@ exports.createPost = (req, res, next) => {
   form.keepExtensions = true;
   form.parse(req, (err, fields, files) => {
     if (err) {
-      return res.status(400).json({ error: "image could not be upload " });
+      return res.status(400).json({ error: 'image could not be upload ' });
     }
     let post = new Post(fields);
     req.profile.hashed_password = undefined;
@@ -55,8 +55,8 @@ exports.createPost = (req, res, next) => {
 
 exports.postByUser = (req, res) => {
   Post.find({ postedBy: req.profile._id })
-    .populate("postedBy", "_id name")
-    .sort("_created")
+    .populate('postedBy', '_id name')
+    .sort('_created')
     .exec((err, posts) => {
       if (err) {
         return res.status(400).json({ error: err });
@@ -70,7 +70,7 @@ exports.isPoster = (req, res, next) => {
   // console.log("req.auth", req.auth);
   // console.log("req.auth._id:", req.auth._id);
   if (!isPoster) {
-    return res.status(403).json({ error: "User is not authorizes" });
+    return res.status(403).json({ error: 'User is not authorizes' });
   }
   next();
 };
@@ -83,7 +83,7 @@ exports.updatePost = (req, res, next) => {
     if (err) {
       return res.status(400).json({ error: err });
     }
-    res.json(post)
+    res.json(post);
   });
 };
 
@@ -93,6 +93,6 @@ exports.deletePost = (req, res) => {
     if (err) {
       return res.status(400).json({ error: err });
     }
-    res.json({ message: "Post deleted sucessufly" });
+    res.json({ message: 'Post deleted sucessufly' });
   });
 };
