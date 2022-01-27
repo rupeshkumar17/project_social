@@ -75,6 +75,7 @@ exports.updateUser = (req, res, next) => {
     // console.log('USER FORM DATA UPDATE: ', user);
     if (files.photo) {
       user.photo.data = fs.readFileSync(files.photo.filepath);
+      // 3 days of intense search and finally made file replace with filetype
       user.photo.contentType = files.photo.type;
     }
     user.save((err, result) => {
