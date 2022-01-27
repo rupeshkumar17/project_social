@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const User = require('../models/user');
-
-
+const formidable = require('formidable');
+const fs = require('fs');
 
 exports.userById = (req, res, next, id) => {
   User.findById(id).exec((err, user) => {
@@ -13,13 +13,13 @@ exports.userById = (req, res, next, id) => {
   });
 };
 
-exports.hasAuthorization = function (req, res, next) {
+exports.hasAuthorization = (req, res, next) => {
   const authorized =
     req.profile && req.auth && req.profile._id === req.auth._id;
   if (!authorized) {
-    return res
-      .status(403)
-      .json({ error: 'user is not authorize to perform this action' });
+    return res.status(403).json({
+      error: 'User is not authorized to perform this action',
+    });
   }
 };
 
@@ -37,35 +37,76 @@ exports.allUsers = (req, res) => {
 exports.getUser = (req, res) => {
   req.profile.hashed_password = undefined;
   req.profile.salt = undefined;
-
   return res.json(req.profile);
 };
 
+// exports.updateUser = (req, res, next) => {
+//   let user = req.profile;
+//   user = _.extend(user, req.body); //extend-mutate first source object
+//   user.updated = Date.now();
+//   user.save(err => {
+//     if (err) {
+//       return res
+//         .status(400)
+//         .json({ error: 'you are not authorized to perform this action' });
+//     }
+//     user.hashed_password = undefined;
+//     user.salt = undefined;
+//     res.json({ user });
+//   });
+// };
+
 exports.updateUser = (req, res, next) => {
-  let user = req.profile;
-  user = _.extend(user, req.body); //extend-mutate first source object
-  user.updated = Date.now();
-  user.save((err) => {
+  let form = new formidable.IncomingForm();
+  // console.log("incoming form data: ", form);
+
+  form.keepExtensions = true;
+  form.parse(req, (err, fields, files) => {
     if (err) {
-      return res
-        .status(400)
-        .json({ error: "you are not authorized to perform this action" });
+      return res.status(400).json({
+        error: 'Photo could not be uploaded',
+      });
     }
-    user.hashed_password = undefined;
-    user.salt = undefined;
-    res.json({ user });
+    //save user
+    let user = req.profile;
+    // console.log('user in update: ', user);
+    user = _.extend(user, fields);
+    user.updated = Date.now();
+    // console.log('USER FORM DATA UPDATE: ', user);
+    if (files.photo) {
+      user.photo.data = fs.readFileSync(files.photo.filepath, 'utf8');
+      user.photo.contentType = files.photo.type;
+    }
+    user.save((err, result) => {
+      if (err) {
+        console.log('upload ERROR ', err);
+        return res.status(400).json({
+          error: 'could not upload',
+        });
+      }
+
+      user.hashed_password = undefined;
+      user.salt = undefined;
+      // console.log('user after update with formdata: ', user);
+      res.json(user);
+    });
   });
 };
 
-
+// exports.userPhoto = (req, res, next) => {
+//   if (req.profile.photo.data) {
+//     res.set(('Content-Type', req.profile.photo.contentType));
+//     return res.send(req.profile.photo.data);
+//   }
+//   next();
+// };
 exports.deleteUser = (req, res, next) => {
   let user = req.profile;
   user.remove((err, user) => {
     if (err) {
       return res.status(400).json({ error: err });
     }
-    // user.hashed_password = undefined;
-    // user.salt = undefined;
+
     res.json({ message: 'User deleted succesfully ' });
   });
 };

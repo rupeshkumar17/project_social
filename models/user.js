@@ -4,26 +4,30 @@ const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   name: {
-    type: 'String',
+    type: String,
     trim: true,
     required: true,
   },
   email: {
-    type: 'String',
+    type: String,
     trim: true,
     required: true,
   },
   hashed_password: {
-    type: 'String',
+    type: String,
 
     required: true,
   },
   salt: String,
   created: {
-    type: 'Date',
+    type: Date,
     default: Date.now,
   },
   updated: Date,
+  photo: {
+    data: Buffer,
+    contentType: String,
+  },
 });
 
 //virtual field
@@ -44,8 +48,8 @@ userSchema
 
 //methods
 userSchema.methods = {
-  authenticate: function (plaintext) {
-    return this.encryptPassword(plaintext) === this.hashed_password;
+  authenticate: function (plainText) {
+    return this.encryptPassword(plainText) === this.hashed_password;
   },
 
   encryptPassword: function (password) {
