@@ -74,7 +74,7 @@ exports.updateUser = (req, res, next) => {
     user.updated = Date.now();
     // console.log('USER FORM DATA UPDATE: ', user);
     if (files.photo) {
-      user.photo.data = fs.readFileSync(files.photo.filepath, 'utf8');
+      user.photo.data = fs.readFileSync(files.photo.filepath);
       user.photo.contentType = files.photo.type;
     }
     user.save((err, result) => {
@@ -93,13 +93,13 @@ exports.updateUser = (req, res, next) => {
   });
 };
 
-// exports.userPhoto = (req, res, next) => {
-//   if (req.profile.photo.data) {
-//     res.set(('Content-Type', req.profile.photo.contentType));
-//     return res.send(req.profile.photo.data);
-//   }
-//   next();
-// };
+exports.userPhoto = (req, res, next) => {
+  if (req.profile.photo.data) {
+    res.set(('Content-Type', req.profile.photo.contentType));
+    return res.send(req.profile.photo.data);
+  }
+  next();
+};
 exports.deleteUser = (req, res, next) => {
   let user = req.profile;
   user.remove((err, user) => {
