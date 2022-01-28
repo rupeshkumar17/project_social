@@ -20,7 +20,7 @@ exports.getPosts = (req, res) => {
     .populate('postedBy', '_id name')
     .select('_id title body ')
     .then((posts) => {
-      res.json({ posts });
+      res.json(posts);
     })
     .catch((err) => {
       console.log(err);
@@ -29,21 +29,24 @@ exports.getPosts = (req, res) => {
 
 exports.createPost = (req, res, next) => {
   let form = new formidable.IncomingForm();
-
   form.keepExtensions = true;
   form.parse(req, (err, fields, files) => {
+    // console.log("fields, files",fields,files);
     if (err) {
       return res.status(400).json({ error: 'image could not be upload ' });
     }
-    let post = new Post(fields);
+
     req.profile.hashed_password = undefined;
     req.profile.salt = undefined;
-    post.postedBy = req.profile;
     // console.log("PROFILE",req.profile);
+
     if (files.photo) {
-      post.photo.data = fs.readFileSync(files.photo.filepath);
-      post.photo.contentType = files.photo.type;
+      fields.photo = fs.readFileSync(files.photo.filepath);
     }
+    let post = new Post(fields);
+    post.postedBy = req.profile;
+    fields.photo = files.photo.type;
+
     post.save((err, result) => {
       if (err) {
         return res.status(400).json({ error: err });

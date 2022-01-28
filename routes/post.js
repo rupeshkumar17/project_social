@@ -19,7 +19,7 @@ router.post(
   '/post/new/:userId',
   requireSignin,
   createPost,
-  createPostValidator
+  createPostValidator 
 );
 router.get('/posts/by/:userId', requireSignin, postByUser);
 router.put('/post/:postId', requireSignin, isPoster, updatePost);

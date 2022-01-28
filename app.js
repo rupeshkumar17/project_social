@@ -33,10 +33,10 @@ app.get('/', (req, res) => {
   });
 });
 
-const myownMiddleware = (req, res, next) => {
-  console.log('middleware is applied');
-  next();
-};
+// const myownMiddleware = (req, res, next) => {
+//   console.log('middleware is applied');
+//   next();
+// };
 //middleware
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -44,7 +44,9 @@ app.use(cookieParser());
 app.use(expressValidator());
 app.use(cors());
 app.use('/', postRoutes);
+
 app.use('/', authRoutes);
+
 app.use('/', userRoutes);
 
 app.use(function (err, req, res, next) {
